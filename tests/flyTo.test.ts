@@ -1,6 +1,6 @@
 // tests/flyTo.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { flyTo } from '../src/flyTo';
+import flyTo from '../src/flyTo';
 
 describe('flyTo', () => {
   let flyingEl: HTMLElement;

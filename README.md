@@ -15,7 +15,7 @@ One day I wondered:
 The short answer:
 - **No**, you cannot easily combine separate animations on the same element.
 - **Yes**, you can create curves by wrapping the element inside a container and animating different properties separately.
-- **But** — when trying to make the projectile follow the flight path tangent, I ran into complexity and limitations.
+- **But** — while simple curves are possible, there are limitations (still working on them :D)
 
 So once I already had some basic functions working for linear and parabolic movements, I organized them into a small, reusable library.
 
@@ -57,7 +57,9 @@ When calling `flyTo('product-image', 'cart-icon')`, the product image will fly s
 
 ## API
 
-### flyTo(projectileId: string, targetId: string, options?: FlyOptions): void`
+```
+flyTo(flyingId: string, targetId: string, options?: FlyOptions): void
+````
 
 Animates an element flying in a **straight linear path** to the target.
 
@@ -70,11 +72,15 @@ Animates an element flying in a **straight linear path** to the target.
 
 ### Example
 
-#### `cannonBall(projectileId: string, targetId: string, options?: FlyOptions): void`
+```
+cannonBall(flyingId: string, targetId: string, options?: FlyOptions): void
+```
 
 Animates an element flying along a **parabolic arc** without rotating the element itself — similar to a cannonball.
 
-#### `projectile(projectileId: string, targetId: string, options?: FlyOptions): void`
+```
+projectile(flyingId: string, targetId: string, options?: FlyOptions): void
+```
 
 Animates an element along a **parabolic arc** with **rotation following the tangent** of the trajectory — like a flying rocket or arrow.
 
