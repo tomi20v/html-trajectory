@@ -1,6 +1,6 @@
 {
   "name": "html-trajectory",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Animate HTML elements along a curved path from their current position to a target element. Eg. a product photo flying into the cart icon.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
