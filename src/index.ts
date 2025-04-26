@@ -1,4 +1,5 @@
 // src/index.ts
-import { flyTo } from "./flyTo";
+import flyTo from "./flyTo";
+import cannonBall from "./cannonBall";
 
-export {flyTo, }
+export {flyTo, cannonBall}

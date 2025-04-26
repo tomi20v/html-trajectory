@@ -1,7 +1,7 @@
 // creates a clone of any element and makes it fliy into the score component
 //  then - if present - the onTransitionEnd() callback is called
 // NOTE this will NOT remove the original element!
-export function flyTo(flyingId: string, targetId: string, onTransitionEnd: () => void = () => {}) {
+export default function flyTo(flyingId: string, targetId: string, onTransitionEnd: () => void = () => {}) {
 
   const flyingEl = document.getElementById(flyingId);
   if (!flyingEl) return;

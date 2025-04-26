@@ -5,6 +5,12 @@ export default defineConfig({
     // Use happy-dom to simulate browser environment
     environment: 'happy-dom',
     // Useful for debugging
-    globals: true
+    globals: true,
+    environmentOptions: {
+      // Explicitly configure happyDOM options
+      'happy-dom': {
+        // Any specific happy-dom options if needed
+      }
+    }
   }
 });
