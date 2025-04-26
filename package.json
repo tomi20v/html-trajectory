@@ -1,0 +1,42 @@
+{
+  "name": "html-trajectory",
+  "version": "0.1.0",
+  "description": "Animate HTML elements along a curved path from their current position to a target element. Eg. a product photo flying into the cart icon.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": ">3.0.0",
+    "happy-dom": "^13.1.4",
+    "typescript": ">5.0.0",
+    "vitest": ">3.0.0"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tomi20v/html-trajectory.git"
+  },
+  "author": "tomi20v <tomi20v@github.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tomi20v/html-trajectory/issues"
+  },
+  "homepage": "https://github.com/tomi20v/html-trajectory#readme",
+  "keywords": [
+    "html",
+    "animation",
+    "fly",
+    "trajectory",
+    "arc",
+    "motion",
+    "typescript",
+    "cannonball",
+    "projectile"
+  ]
+}
