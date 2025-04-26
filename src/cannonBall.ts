@@ -85,7 +85,12 @@ export default function cannonBall(
 
       if (elapsed >= duration) {
         clone.style.transform = `translateY(${deltaY}px) scale(${scale})`;
-        onTransitionEnd();
+        // Make sure this callback is definitely executed
+        try {
+          onTransitionEnd();
+        } catch (e) {
+          console.error("Error in onTransitionEnd callback", e);
+        }
         wrapper.remove();
         if (removeOriginal) {
           flyingEl?.remove();

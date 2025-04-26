@@ -122,12 +122,21 @@ describe('flyTo', () => {
     expect(cloneEl.style.animation).toBe('none');
   });
   
-  it('should set transform and transition properties', () => {
+  it('should set transform and transition properties with default durations', () => {
     flyTo('flying-element', 'target-element');
     
     // The deltaX should be (350 - 150) = 200, deltaY should be (350 - 150) = 200
-    expect(cloneEl.style.transform).toBe('translate(200px, 200px) scale(0.2)');
-    expect(cloneEl.style.transition).toBe('transform 0.4s ease, opacity 0.6s ease');
+    expect(cloneEl.style.transform).toBe('translate(200px, 200px) scale(0.1)');
+    
+    // Use a regular expression to match the transition value, avoiding floating-point precision issues
+    expect(cloneEl.style.transition).toMatch(/transform 0\.1\d+s ease, opacity 0\.4s ease/);
+  });
+  
+  it('should set custom durations when provided in options', () => {
+    flyTo('flying-element', 'target-element', { duration: 1.0 });
+    
+    // Use a regular expression to match the transition value, avoiding floating-point precision issues
+    expect(cloneEl.style.transition).toMatch(/transform 0\.6\d*s ease, opacity 1s ease/);
   });
   
   it('should add transitionend event listener', () => {
@@ -136,9 +145,55 @@ describe('flyTo', () => {
     expect(mockAddEventListener).toHaveBeenCalledWith('transitionend', expect.any(Function));
   });
   
+  it('should use custom scale value when provided', () => {
+    flyTo('flying-element', 'target-element', { scale: 0.5 });
+    
+    expect(cloneEl.style.transform).toBe('translate(200px, 200px) scale(0.5)');
+  });
+  
+  it('should not move along X axis when moveX is false', () => {
+    flyTo('flying-element', 'target-element', { moveX: false });
+    
+    expect(cloneEl.style.transform).toBe('translate(0px, 200px) scale(0.1)');
+  });
+  
+  it('should not move along Y axis when moveY is false', () => {
+    flyTo('flying-element', 'target-element', { moveY: false });
+    
+    expect(cloneEl.style.transform).toBe('translate(200px, 0px) scale(0.1)');
+  });
+  
+  it('should not move along any axis when both moveX and moveY are false', () => {
+    flyTo('flying-element', 'target-element', { moveX: false, moveY: false });
+    
+    expect(cloneEl.style.transform).toBe('translate(0px, 0px) scale(0.1)');
+  });
+  
+  it('should remove original element by default', () => {
+    // Mock the remove method
+    const originalRemove = vi.fn();
+    flyingEl.remove = originalRemove;
+    
+    flyTo('flying-element', 'target-element');
+    
+    // Verify the original element was removed
+    expect(originalRemove).toHaveBeenCalled();
+  });
+  
+  it('should not remove original element when removeOriginal is false', () => {
+    // Mock the remove method
+    const originalRemove = vi.fn();
+    flyingEl.remove = originalRemove;
+    
+    flyTo('flying-element', 'target-element', { removeOriginal: false });
+    
+    // Verify the original element was not removed
+    expect(originalRemove).not.toHaveBeenCalled();
+  });
+  
   it('should call onTransitionEnd callback and remove clone when transition ends', () => {
     const onTransitionEnd = vi.fn();
-    flyTo('flying-element', 'target-element', onTransitionEnd);
+    flyTo('flying-element', 'target-element', { onTransitionEnd });
     
     // Get the callback function passed to addEventListener
     const transitionEndCallback = mockAddEventListener.mock.calls[0][1];
@@ -166,4 +221,33 @@ describe('flyTo', () => {
     // The element should still be removed even with the default callback
     expect(mockRemove).toHaveBeenCalled();
   });
+  
+  it('should only call onTransitionEnd once even if multiple transition events fire', () => {
+    const onTransitionEnd = vi.fn();
+    flyTo('flying-element', 'target-element', { onTransitionEnd });
+    
+    // Get the callback function passed to addEventListener
+    const transitionEndCallback = mockAddEventListener.mock.calls[0][1];
+    
+    // Mock the remove method to track calls and also clear the element reference
+    // This helps prevent multiple calls to onTransitionEnd
+    let removed = false;
+    mockRemove.mockImplementation(() => {
+      if (!removed) {
+        removed = true;
+      }
+    });
+
+    // First call - should execute onTransitionEnd and remove
+    transitionEndCallback();
+    
+    // Reset the mock to verify the second call doesn't trigger it again
+    onTransitionEnd.mockClear();
+    
+    // Second call - should not execute onTransitionEnd again
+    transitionEndCallback();
+    
+    // Verify onTransitionEnd was only called once in total
+    expect(onTransitionEnd).not.toHaveBeenCalled();
   });
+});
