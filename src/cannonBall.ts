@@ -7,7 +7,7 @@ export default function cannonBall(
     duration?: number,
     acceleration?: number, // in m/s^2
     scale?: number,
-    threeDScale?: boolean,
+    fly3D?: boolean,
     onTransitionEnd?: () => void,
     removeOriginal?: boolean,
   } = {}
@@ -18,7 +18,7 @@ export default function cannonBall(
     duration = 1.2,
     acceleration = 9.81,
     scale = 1,
-    threeDScale = false,
+    fly3D = false,
     onTransitionEnd = () => {},
     removeOriginal = true,
   } = options;
@@ -65,7 +65,7 @@ export default function cannonBall(
     flyingEl.remove();
   }
 
-  const effectiveAcceleration = threeDScale ? 0 : acceleration;
+  const effectiveAcceleration = fly3D ? 0 : acceleration;
   const accelerationPx = effectiveAcceleration * 100; // convert m/s² to px/s²
 
   if (moveX) {

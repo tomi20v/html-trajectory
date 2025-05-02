@@ -328,7 +328,7 @@ describe('cannonBall', () => {
         moveX: false, 
         moveY: true,
         duration: 1,
-        threeDScale: true,
+        fly3D: true,
         scale: 0.5,
         onTransitionEnd
       });
@@ -383,7 +383,7 @@ describe('cannonBall', () => {
     
     vi.useRealTimers();
   });
-  
+
   it('should use custom duration when provided', () => {
     cannonBall('flying-element', 'target-element', { 
       moveX: true, 

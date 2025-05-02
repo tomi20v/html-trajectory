@@ -1,5 +1,5 @@
 export default function projectile(
-  projectileId: string,
+  flyingId: string,
   targetId: string,
   options?: {
     moveX?: boolean;
@@ -7,10 +7,11 @@ export default function projectile(
     duration?: number;
     acceleration?: number;
     scale?: number;
+    onTransitionEnd?: () => void;
     removeOriginal?: boolean;
   }
 ) {
-  const projectile = document.getElementById(projectileId) as HTMLElement | null;
+  const projectile = document.getElementById(flyingId) as HTMLElement | null;
   const target = document.getElementById(targetId) as HTMLElement | null;
   const field = document.getElementById('field') as HTMLElement | null;
 
@@ -61,6 +62,7 @@ export default function projectile(
   const moveX = options?.moveX ?? true;
   const moveY = options?.moveY ?? true;
   const targetScale = options?.scale ?? 1;
+  const onTransitionEnd = options?.onTransitionEnd ?? (() => {});
   const removeOriginal = options?.removeOriginal ?? true;
 
   if (removeOriginal) {
@@ -113,6 +115,11 @@ export default function projectile(
     if (t < duration / 1000) {
       requestAnimationFrame(animate);
     } else {
+      try {
+        onTransitionEnd();
+      } catch (e) {
+        console.error("Error in onTransitionEnd callback", e);
+      }
       clone.remove();
     }
   }
