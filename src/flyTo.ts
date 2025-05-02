@@ -8,6 +8,7 @@ export default function flyTo(
     scale?: number,
     onTransitionEnd?: () => void,
     removeOriginal?: boolean,
+    resetTransformation?: boolean,
   } = {}
 ) {
   const {
@@ -17,6 +18,7 @@ export default function flyTo(
     scale = 0.1,
     onTransitionEnd = () => {},
     removeOriginal = true,
+    resetTransformation = false,
   } = options;
 
   const flyingEl = document.getElementById(flyingId);
@@ -27,7 +29,6 @@ export default function flyTo(
 
   const flyingRect = flyingEl.getBoundingClientRect();
   const clone = flyingEl.cloneNode(true) as HTMLElement;
-  document.body.appendChild(clone);
   Object.assign(clone.style, {
     position: 'absolute',
     top: flyingRect.top + 'px',
@@ -38,15 +39,26 @@ export default function flyTo(
     opacity: 1,
     animation: 'none',
   });
+  
+  // Reset transformOrigin if option is enabled
+  if (resetTransformation) {
+    // We temporarily set transform to none to clear any existing transforms
+    // but we'll override it shortly with the animation transform
+    clone.style.transform = 'none';
+    clone.style.transformOrigin = 'center center';
+  }
+  document.body.appendChild(clone);
+  
   clone.getBoundingClientRect();
-
+  
   const targetRect = targetEl.getBoundingClientRect();
   const deltaX = (targetRect.left + targetRect.right) / 2 - (flyingRect.left + flyingRect.right) / 2;
   const deltaY = (targetRect.top + targetRect.bottom) / 2 - (flyingRect.top + flyingRect.bottom) / 2;
-
+  
   const translateX = moveX ? `${deltaX}px` : '0px';
   const translateY = moveY ? `${deltaY}px` : '0px';
-
+  
+  // Set the animation transform - this will override any 'none' set earlier
   clone.style.transform = `translate(${translateX}, ${translateY}) scale(${scale})`;
   clone.style.transition = `transform ${duration*0.8 - 0.2}s ease, opacity ${duration}s ease`;
 

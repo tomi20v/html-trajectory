@@ -171,6 +171,29 @@ describe('cannonBall', () => {
     expect(flyingEl.remove).not.toHaveBeenCalled();
   });
   
+  it('should reset transform and transformOrigin when resetTransformation is true', () => {
+    // Set up a mock transform on cloneEl
+    cloneEl.style.transform = 'rotate(45deg) scale(0.8)';
+    cloneEl.style.transformOrigin = 'top left';
+    
+    cannonBall('flying-element', 'target-element', { resetTransformation: true });
+    
+    // Verify the transform properties were reset
+    expect(cloneEl.style.transform).toBe('none');
+    expect(cloneEl.style.transformOrigin).toBe('center center');
+  });
+  
+  it('should not reset transformOrigin when resetTransformation is false', () => {
+    // Set up a mock transform on cloneEl
+    cloneEl.style.transform = 'rotate(45deg) scale(0.8)';
+    cloneEl.style.transformOrigin = 'top left';
+    
+    cannonBall('flying-element', 'target-element', { resetTransformation: false });
+    
+    // Verify transformOrigin was not changed to center center
+    expect(cloneEl.style.transformOrigin).not.toBe('center center');
+  });
+  
   it('should set transform and transition for horizontal movement when moveX is true', () => {
     cannonBall('flying-element', 'target-element', { moveX: true, moveY: false });
     

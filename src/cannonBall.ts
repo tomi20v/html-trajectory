@@ -2,14 +2,15 @@ export default function cannonBall(
   flyingId: string,
   targetId: string,
   options: {
-    moveX?: boolean,
-    moveY?: boolean,
-    duration?: number,
-    acceleration?: number, // in m/s^2
-    scale?: number,
-    fly3D?: boolean,
-    onTransitionEnd?: () => void,
-    removeOriginal?: boolean,
+    moveX?: boolean;
+    moveY?: boolean;
+    duration?: number;
+    acceleration?: number; // in m/s^2
+    scale?: number;
+    fly3D?: boolean;
+    onTransitionEnd?: () => void;
+    removeOriginal?: boolean;
+    resetTransformation?: boolean;
   } = {}
   ) {
   const {
@@ -21,6 +22,7 @@ export default function cannonBall(
     fly3D = false,
     onTransitionEnd = () => {},
     removeOriginal = true,
+    resetTransformation = false,
   } = options;
 
   const flyingEl = document.getElementById(flyingId);
@@ -53,8 +55,14 @@ export default function cannonBall(
     left: '0px',
     width: '100%',
     height: '100%',
-    transform: 'none',
   });
+  // Always set transform to none for the initial clone
+  clone.style.transform = 'none';
+  
+  // Reset transformOrigin if option is enabled
+  if (resetTransformation) {
+    clone.style.transformOrigin = 'center center';
+  }
 
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);

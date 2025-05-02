@@ -1,7 +1,209 @@
 // tests/projectile.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import projectile from '../src/projectile';
+// tests/projectile.test.ts
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import projectile from '../src/projectile';
 
+describe('projectile', () => {
+  let flyingEl: HTMLElement;
+  let targetEl: HTMLElement;
+  let fieldEl: HTMLElement | null;
+  let cloneEl: HTMLElement;
+  let mockGetElementById: any;
+  let mockAppendChild: any;
+  let mockRemove: any;
+  let mockRequestAnimationFrame: any;
+  
+  beforeEach(() => {
+    // Clean up the document
+    document.body.innerHTML = '';
+    
+    // Create actual DOM elements
+    flyingEl = document.createElement('div');
+    flyingEl.id = 'flying-element';
+    document.body.appendChild(flyingEl);
+    
+    targetEl = document.createElement('div');
+    targetEl.id = 'target-element';
+    document.body.appendChild(targetEl);
+    
+    fieldEl = document.createElement('div');
+    fieldEl.id = 'field';
+    document.body.appendChild(fieldEl);
+    
+    // Create clone element
+    cloneEl = document.createElement('div');
+    
+    // Mock getBoundingClientRect for all elements
+    flyingEl.getBoundingClientRect = vi.fn().mockReturnValue({
+      top: 100,
+      left: 100,
+      right: 200,
+      bottom: 200,
+      width: 100,
+      height: 100
+    });
+    
+    targetEl.getBoundingClientRect = vi.fn().mockReturnValue({
+      top: 300,
+      left: 300,
+      right: 400,
+      bottom: 400,
+      width: 100,
+      height: 100
+    });
+    
+    fieldEl.getBoundingClientRect = vi.fn().mockReturnValue({
+      top: 0,
+      left: 0,
+      right: 1000,
+      bottom: 1000,
+      width: 1000,
+      height: 1000
+    });
+    
+    cloneEl.getBoundingClientRect = vi.fn();
+    
+    // Mock window.getComputedStyle
+    vi.spyOn(window, 'getComputedStyle').mockReturnValue({
+      transform: 'matrix(1, 0, 0, 1, 0, 0)',
+    } as CSSStyleDeclaration);
+    
+    // Mock other methods
+    mockRemove = vi.fn();
+    flyingEl.remove = mockRemove;
+    cloneEl.remove = mockRemove;
+    
+    // Mock cloneNode to return our controlled clone
+    flyingEl.cloneNode = vi.fn().mockReturnValue(cloneEl);
+    
+    // Mock document methods
+    mockGetElementById = vi.spyOn(document, 'getElementById');
+    mockGetElementById.mockImplementation((id: string) => {
+      if (id === 'flying-element') return flyingEl;
+      if (id === 'target-element') return targetEl;
+      if (id === 'field') return fieldEl;
+      return null;
+    });
+    
+    mockAppendChild = vi.spyOn(fieldEl, 'appendChild');
+    mockAppendChild.mockImplementation(() => cloneEl);
+    
+    // Mock requestAnimationFrame
+    mockRequestAnimationFrame = vi.fn();
+    (window as any).requestAnimationFrame = mockRequestAnimationFrame;
+  });
+  
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+  
+  it('should throw an error if flying element is not found', () => {
+    mockGetElementById.mockImplementation((id: string) => {
+      if (id === 'flying-element') return null;
+      if (id === 'target-element') return targetEl;
+      if (id === 'field') return fieldEl;
+      return null;
+    });
+    
+    expect(() => projectile('flying-element', 'target-element')).toThrow();
+  });
+  
+  it('should throw an error if target element is not found', () => {
+    mockGetElementById.mockImplementation((id: string) => {
+      if (id === 'flying-element') return flyingEl;
+      if (id === 'target-element') return null;
+      if (id === 'field') return fieldEl;
+      return null;
+    });
+    
+    expect(() => projectile('flying-element', 'target-element')).toThrow();
+  });
+  
+  it('should clone and append flying element to container', () => {
+    projectile('flying-element', 'target-element');
+    
+    expect(flyingEl.cloneNode).toHaveBeenCalledWith(true);
+    expect(mockAppendChild).toHaveBeenCalledWith(cloneEl);
+  });
+  
+  it('should use document.body as container if field is not found', () => {
+    mockGetElementById.mockImplementation((id: string) => {
+      if (id === 'flying-element') return flyingEl;
+      if (id === 'target-element') return targetEl;
+      if (id === 'field') return null;
+      return null;
+    });
+    
+    const bodyAppendChild = vi.spyOn(document.body, 'appendChild');
+    
+    projectile('flying-element', 'target-element');
+    
+    expect(bodyAppendChild).toHaveBeenCalledWith(cloneEl);
+  });
+  
+  it('should set correct styles on cloned element', () => {
+    projectile('flying-element', 'target-element');
+    
+    expect(cloneEl.style.position).toBe('absolute');
+    expect(cloneEl.style.pointerEvents).toBe('none');
+    expect(cloneEl.style.margin).toBe('0px');
+  });
+  
+  it('should remove original element by default', () => {
+    projectile('flying-element', 'target-element');
+    
+    expect(flyingEl.remove).toHaveBeenCalled();
+  });
+  
+  it('should not remove original element when removeOriginal is false', () => {
+    projectile('flying-element', 'target-element', { removeOriginal: false });
+    
+    expect(flyingEl.remove).not.toHaveBeenCalled();
+  });
+  
+  it('should set transformOrigin when resetTransformation is true', () => {
+    // Set up a mock transform on cloneEl
+    cloneEl.style.transform = 'rotate(45deg) scale(0.8)';
+    cloneEl.style.transformOrigin = 'top left';
+    
+    // We need to spy on the style.transform setter to verify it was called with 'none'
+    const transformSpy = vi.spyOn(cloneEl.style, 'transform', 'set');
+    
+    projectile('flying-element', 'target-element', { resetTransformation: true });
+    
+    // Verify transform was set to none at some point
+    expect(transformSpy).toHaveBeenCalledWith('none');
+    expect(cloneEl.style.transformOrigin).toBe('center center');
+  });
+  
+  it('should not set transformOrigin when resetTransformation is falsy', () => {
+    // Set up a mock transform on cloneEl
+    cloneEl.style.transform = 'rotate(45deg) scale(0.8)';
+    cloneEl.style.transformOrigin = 'top left';
+    
+    projectile('flying-element', 'target-element', { resetTransformation: false });
+    
+    // Verify the transformOrigin was not changed
+    expect(cloneEl.style.transformOrigin).not.toBe('center center');
+  });
+  
+  it('should use default values when options are not provided', () => {
+    projectile('flying-element', 'target-element');
+    
+    // By default, resetTransformation should not be applied
+    // We set a transform manually to test this
+    cloneEl.style.transform = 'rotate(45deg)';
+    expect(cloneEl.style.transform).toBe('rotate(45deg)');
+  });
+  
+  it('should start animation when called', () => {
+    projectile('flying-element', 'target-element');
+    
+    expect(mockRequestAnimationFrame).toHaveBeenCalled();
+  });
+});
 describe('projectile', () => {
   let projectileEl: HTMLElement;
   let targetEl: HTMLElement;

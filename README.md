@@ -3,7 +3,7 @@
 **html-trajectory** provides lightweight HTML animations to smoothly "fly" elements from their current position to a target element — for example, animating a product image flying into a shopping cart icon.  
 It’s ideal for parabolic movement, curved animations, and element-to-element transitions.
 
-disclaimer: this project was happily vibe coded at it's "best". I used *any* LLM which worked at that moment
+disclaimer: this project was happily vibe coded at it's "best" as an experiment. I used *any* LLM which did the job that moment.
 
 ---
 
@@ -74,6 +74,7 @@ Animates an element flying in a **straight linear path** to the target.
   - **`scale`** — Target scale factor at the end of animation (default is `1`).
   - **`onTransitionEnd`** — Callback function that executes when the animation completes (default is an empty function).
   - **`removeOriginal`** — Whether to remove the original element (default is `true`).
+  - **`resetTransformation`** — When true, resets the clone's transform and transform-origin after cloning (default is `false`).
 
 ### Example
 
@@ -94,6 +95,7 @@ Animates an element flying along a **parabolic arc** without rotating the elemen
   - **`scale`** — Target scale factor at the end of animation (default is `1`).
   - **`onTransitionEnd`** — Callback function that executes when the animation completes (default is an empty function).
   - **`removeOriginal`** — Whether to remove the original element (default is `true`).
+  - **`resetTransformation`** — When true, resets the clone's transform and transform-origin after cloning (default is `false`).
 
 ```
 projectile(flyingId: string, targetId: string, options?: FlyOptions): void
@@ -111,6 +113,7 @@ Animates an element along a **parabolic arc** with **rotation following the tang
   - **`scale`** — Target scale factor at the end of animation (default is `1`).
   - **`onTransitionEnd`** — Callback function that executes when the animation completes (default is an empty function).
   - **`removeOriginal`** — Whether to remove the original element (default is `true`).
+  - **`resetTransformation`** — When true, resets the clone's transform and transform-origin after cloning (default is `false`).
 
 ---
 

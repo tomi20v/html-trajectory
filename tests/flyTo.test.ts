@@ -191,6 +191,30 @@ describe('flyTo', () => {
     expect(originalRemove).not.toHaveBeenCalled();
   });
   
+  it('should set transformOrigin when resetTransformation is true', () => {
+    // Set an initial transform on the cloned element
+    cloneEl.style.transform = 'rotate(45deg) scale(0.8)';
+    cloneEl.style.transformOrigin = 'top left';
+    
+    flyTo('flying-element', 'target-element', { resetTransformation: true });
+    
+    // Verify the transformOrigin was reset
+    // Note: We can't verify transform is 'none' because it's immediately overwritten
+    // with the animation transform
+    expect(cloneEl.style.transformOrigin).toBe('center center');
+  });
+  
+  it('should not set transformOrigin when resetTransformation is false', () => {
+    // Set an initial transform on the cloned element
+    cloneEl.style.transform = 'rotate(45deg) scale(0.8)';
+    cloneEl.style.transformOrigin = 'top left';
+    
+    flyTo('flying-element', 'target-element', { resetTransformation: false });
+    
+    // Verify the transformOrigin was not changed
+    expect(cloneEl.style.transformOrigin).not.toBe('center center');
+  });
+  
   it('should call onTransitionEnd callback and remove clone when transition ends', () => {
     const onTransitionEnd = vi.fn();
     flyTo('flying-element', 'target-element', { onTransitionEnd });

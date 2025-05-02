@@ -9,6 +9,7 @@ export default function projectile(
     scale?: number;
     onTransitionEnd?: () => void;
     removeOriginal?: boolean;
+    resetTransformation?: boolean;
   }
 ) {
   const flying = document.getElementById(flyingId) as HTMLElement | null;
@@ -27,6 +28,11 @@ export default function projectile(
   clone.style.position = 'absolute';
   clone.style.pointerEvents = 'none';
   clone.style.margin = '0';
+  // Reset transformation if option is enabled
+  if (options?.resetTransformation) {
+    clone.style.transform = 'none';
+    clone.style.transformOrigin = 'center center';
+  }
   containerElement.appendChild(clone);
 
   const computedStyle = window.getComputedStyle(flying);
