@@ -3,6 +3,8 @@
 **html-trajectory** provides lightweight HTML animations to smoothly "fly" elements from their current position to a target element — for example, animating a product image flying into a shopping cart icon.  
 It’s ideal for parabolic movement, curved animations, and element-to-element transitions.
 
+disclaimer: this project was happily vibe coded at it's "best". I used *any* LLM which worked at that moment
+
 ---
 
 ## But why?
@@ -63,12 +65,15 @@ flyTo(flyingId: string, targetId: string, options?: FlyOptions): void
 
 Animates an element flying in a **straight linear path** to the target.
 
-- **`projectileId`** — ID of the element to fly (the moving projectile).
+- **`flyingId`** — ID of the element to fly (the moving projectile).
 - **`targetId`** — ID of the target element (the destination).
 - **`options`** *(optional)* — A configuration object:
-  - **`duration`** — Animation duration in milliseconds (default is 400ms), @TODO PLANNED.
-  - **`easing`** — CSS easing function for the animation (default is `"linear"`), @TODO PLANNED.
-  - **`onTransitionEnd`** — Amount of delay before the animation starts, in milliseconds (default is `0`).
+  - **`moveX`** — Whether to move horizontally (default is `true`).
+  - **`moveY`** — Whether to move vertically (default is `true`).
+  - **`duration`** — Animation duration in seconds (default is `1`).
+  - **`scale`** — Target scale factor at the end of animation (default is `1`).
+  - **`onTransitionEnd`** — Callback function that executes when the animation completes (default is an empty function).
+  - **`removeOriginal`** — Whether to remove the original element (default is `true`).
 
 ### Example
 
@@ -78,11 +83,34 @@ cannonBall(flyingId: string, targetId: string, options?: FlyOptions): void
 
 Animates an element flying along a **parabolic arc** without rotating the element itself — similar to a cannonball.
 
+- **`flyingId`** — ID of the element to fly (the moving projectile).
+- **`targetId`** — ID of the target element (the destination).
+- **`options`** *(optional)* — A configuration object:
+  - **`moveX`** — Whether to move horizontally (default is `true`).
+  - **`moveY`** — Whether to move vertically (default is `true`).
+  - **`duration`** — Animation duration in seconds (default is `1`).
+  - **`acceleration`** — Vertical acceleration in pixels/s² (default is `9.81`). Higher values create a steeper arc.
+  - **`fly3D`** — When true, disables acceleration to create a straight-line path instead of a parabolic arc (default is `false`).
+  - **`scale`** — Target scale factor at the end of animation (default is `1`).
+  - **`onTransitionEnd`** — Callback function that executes when the animation completes (default is an empty function).
+  - **`removeOriginal`** — Whether to remove the original element (default is `true`).
+
 ```
 projectile(flyingId: string, targetId: string, options?: FlyOptions): void
 ```
 
 Animates an element along a **parabolic arc** with **rotation following the tangent** of the trajectory — like a flying rocket or arrow.
+
+- **`flyingId`** — ID of the element to fly (the moving projectile).
+- **`targetId`** — ID of the target element (the destination).
+- **`options`** *(optional)* — A configuration object:
+  - **`moveX`** — Whether to move horizontally (default is `true`).
+  - **`moveY`** — Whether to move vertically (default is `true`).
+  - **`duration`** — Animation duration in seconds (default is `1`).
+  - **`acceleration`** — Vertical acceleration in pixels/s² (default is `9.81`). Higher values create a steeper arc.
+  - **`scale`** — Target scale factor at the end of animation (default is `1`).
+  - **`onTransitionEnd`** — Callback function that executes when the animation completes (default is an empty function).
+  - **`removeOriginal`** — Whether to remove the original element (default is `true`).
 
 ---
 
