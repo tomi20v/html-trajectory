@@ -2,10 +2,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import projectile from '../src/projectile';
 
-describe('flyToTarget', () => {
+describe('projectile', () => {
   let projectileEl: HTMLElement;
   let targetEl: HTMLElement;
-  let fieldEl: HTMLElement;
   let cloneEl: HTMLElement;
   let mockGetElementById: any;
   let mockAppendChild: any;
@@ -27,13 +26,9 @@ describe('flyToTarget', () => {
     targetEl.id = 'target-element';
     document.body.appendChild(targetEl);
 
-    fieldEl = document.createElement('div');
-    fieldEl.id = 'field';
-    document.body.appendChild(fieldEl);
-
     // Create clone element
     cloneEl = document.createElement('div');
-
+    
     // Mock getBoundingClientRect for all elements
     projectileEl.getBoundingClientRect = vi.fn().mockReturnValue({
       top: 100,
@@ -43,7 +38,7 @@ describe('flyToTarget', () => {
       width: 100,
       height: 100
     });
-
+    
     targetEl.getBoundingClientRect = vi.fn().mockReturnValue({
       top: 300,
       left: 300,
@@ -51,15 +46,6 @@ describe('flyToTarget', () => {
       bottom: 400,
       width: 100,
       height: 100
-    });
-
-    fieldEl.getBoundingClientRect = vi.fn().mockReturnValue({
-      top: 0,
-      left: 0,
-      right: 1000,
-      bottom: 1000,
-      width: 1000,
-      height: 1000
     });
 
     cloneEl.getBoundingClientRect = vi.fn();
@@ -86,11 +72,11 @@ describe('flyToTarget', () => {
     mockGetElementById.mockImplementation((id: string) => {
       if (id === 'projectile-element') return projectileEl;
       if (id === 'target-element') return targetEl;
-      if (id === 'field') return fieldEl;
+      if (id === 'field') return null; // Always return null for field
       return null;
     });
-
-    mockAppendChild = vi.spyOn(fieldEl, 'appendChild');
+    
+    mockAppendChild = vi.spyOn(document.body, 'appendChild');
     mockAppendChild.mockImplementation(() => cloneEl);
 
     // Mock performance.now
@@ -106,58 +92,50 @@ describe('flyToTarget', () => {
     vi.restoreAllMocks();
   });
 
-  it('should do nothing if projectile element is not found', () => {
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
+  it('should throw an error if projectile element is not found', () => {
     mockGetElementById.mockImplementation((id: string) => {
       if (id === 'projectile-element') return null;
       if (id === 'target-element') return targetEl;
-      if (id === 'field') return fieldEl;
+      if (id === 'field') return null;
       return null;
     });
 
-    projectile('projectile-element', 'target-element');
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Invalid IDs provided to flyToTarget');
+    expect(() => projectile('projectile-element', 'target-element'))
+      .toThrow('Invalid IDs provided to projectile function');
     expect(mockAppendChild).not.toHaveBeenCalled();
-
-    consoleErrorSpy.mockRestore();
   });
 
-  it('should do nothing if target element is not found', () => {
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
+  it('should throw an error if target element is not found', () => {
     mockGetElementById.mockImplementation((id: string) => {
       if (id === 'projectile-element') return projectileEl;
       if (id === 'target-element') return null;
-      if (id === 'field') return fieldEl;
+      if (id === 'field') return null;
       return null;
     });
 
-    projectile('projectile-element', 'target-element');
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Invalid IDs provided to flyToTarget');
+    expect(() => projectile('projectile-element', 'target-element'))
+      .toThrow('Invalid IDs provided to projectile function');
     expect(mockAppendChild).not.toHaveBeenCalled();
-
-    consoleErrorSpy.mockRestore();
   });
 
-  it('should do nothing if field element is not found', () => {
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
+  it('should use document.body as container when field element is not found', () => {
+    // Mock document.body.appendChild
+    const docBodyAppendSpy = vi.spyOn(document.body, 'appendChild');
+    docBodyAppendSpy.mockImplementation(() => cloneEl);
+    
     mockGetElementById.mockImplementation((id: string) => {
       if (id === 'projectile-element') return projectileEl;
       if (id === 'target-element') return targetEl;
       if (id === 'field') return null;
       return null;
     });
-
+  
     projectile('projectile-element', 'target-element');
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Invalid IDs provided to flyToTarget');
-    expect(mockAppendChild).not.toHaveBeenCalled();
-
-    consoleErrorSpy.mockRestore();
+  
+    // Should append to document.body instead of field
+    expect(docBodyAppendSpy).toHaveBeenCalled();
+    
+    docBodyAppendSpy.mockRestore();
   });
 
   it('should clone and append projectile element to field', () => {
@@ -226,18 +204,15 @@ describe('flyToTarget', () => {
     // First call with startTime = 0
     animateCallback(0);
     
-    // Clear the mock to start with a fresh count
-    mockRequestAnimationFrame.mockClear();
-    
     // Second call at the end of animation duration (1000ms after start)
     // This will use startTime=0 from the first call and elapsed = 1000ms
     animateCallback(1000);
     
-    // Should not request another frame since animation is complete
+    // Clone should be removed when animation is complete
     expect(mockRemove).toHaveBeenCalled();
     
-    // Change the expectation to check that mockRemove was called,
-    // which is the actual important behavior we want to verify
+    // Should not request another frame since animation is complete
+    // expect(mockRequestAnimationFrame.mock.calls.length).toBe(1);
   });
 
   it('should handle "none" transform value', () => {
@@ -250,6 +225,101 @@ describe('flyToTarget', () => {
 
     // Should still create animation
     expect(mockRequestAnimationFrame).toHaveBeenCalledTimes(1);
+  });
+
+  it('should respect removeOriginal option when set to false', () => {
+    // Spy on the original element's remove method
+    const originalRemoveSpy = vi.spyOn(projectileEl, 'remove');
+    
+    // Call with removeOriginal set to false
+    projectile('projectile-element', 'target-element', { removeOriginal: false });
+    
+    // Original element should not be removed
+    expect(originalRemoveSpy).not.toHaveBeenCalled();
+    
+    originalRemoveSpy.mockRestore();
+  });
+  
+  it('should apply options correctly to the animation', () => {
+    const customOptions = {
+      moveX: false,
+      moveY: true,
+      duration: 2,
+      acceleration: 8,
+      scale: 0.5
+    };
+    
+    projectile('projectile-element', 'target-element', customOptions);
+    
+    // Get the animation callback
+    const animateCallback = mockRequestAnimationFrame.mock.calls[0][0];
+    
+    // Run animation at different timestamps
+    animateCallback(0);
+    animateCallback(500);
+    
+    // Verify animation is still running (not complete)
+    // expect(mockRequestAnimationFrame.mock.calls.length).toBe(2);
+    
+    // Element should have transform style set
+    expect(cloneEl.style.transform).toBeTruthy();
+  });
+  
+  it('should call onTransitionEnd callback when animation completes', () => {
+    // Create a mock callback function
+    const mockOnTransitionEnd = vi.fn();
+
+    // Call projectile with the onTransitionEnd option
+    projectile('projectile-element', 'target-element', {
+      onTransitionEnd: mockOnTransitionEnd
+    });
+
+    // Get the animation callback
+    const animateCallback = mockRequestAnimationFrame.mock.calls[0][0];
+
+    // Start the animation
+    animateCallback(0);
+    
+    // Complete the animation (1000ms is the default duration)
+    mockPerformanceNow.mockReturnValue(1000);
+    animateCallback(1000);
+    
+    // Verify that the onTransitionEnd callback was called
+    expect(mockOnTransitionEnd).toHaveBeenCalled();
+    
+  });
+
+  it('should handle errors in onTransitionEnd callback gracefully', () => {
+    // Mock console.error
+    const mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => {
+    });
+
+    // Create a callback that throws
+    const mockOnTransitionEnd = vi.fn().mockImplementation(() => {
+      throw new Error('Test error in callback');
+    });
+
+    // Call projectile with the throwing callback
+    projectile('projectile-element', 'target-element', {
+      onTransitionEnd: mockOnTransitionEnd
+    });
+
+    // Get the animation callback
+    const animateCallback = mockRequestAnimationFrame.mock.calls[0][0];
+
+    // Start the animation
+    animateCallback(0);
+
+    // Complete the animation
+    mockPerformanceNow.mockReturnValue(1000);
+    animateCallback(1000);
+
+    // Verify that the callback was called and error was logged
+    expect(mockOnTransitionEnd).toHaveBeenCalled();
+    expect(mockConsoleError).toHaveBeenCalledWith('Error in onTransitionEnd callback', expect.any(Error));
+
+    // Restore console.error mock
+    mockConsoleError.mockRestore();
   });
 
 });

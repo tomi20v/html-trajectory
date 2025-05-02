@@ -11,23 +11,25 @@ export default function projectile(
     removeOriginal?: boolean;
   }
 ) {
-  const projectile = document.getElementById(flyingId) as HTMLElement | null;
+  const flying = document.getElementById(flyingId) as HTMLElement | null;
   const target = document.getElementById(targetId) as HTMLElement | null;
-  const field = document.getElementById('field') as HTMLElement | null;
 
-  if (!projectile || !target || !field) {
-    console.error('Invalid IDs provided to flyToTarget');
-    return;
+  // Try to get the field element first, fall back to document.body if not found
+  const field = document.getElementById('field') as HTMLElement | null;
+  const containerElement = field || document.body;
+
+  if (!flying || !target) {
+    throw 'Invalid IDs provided to projectile function';
   }
 
-  const clone = projectile.cloneNode(true) as HTMLElement;
+  const clone = flying.cloneNode(true) as HTMLElement;
   clone.removeAttribute('id');
   clone.style.position = 'absolute';
   clone.style.pointerEvents = 'none';
   clone.style.margin = '0';
-  field.appendChild(clone);
+  containerElement.appendChild(clone);
 
-  const computedStyle = window.getComputedStyle(projectile);
+  const computedStyle = window.getComputedStyle(flying);
   const transform = computedStyle.transform;
   let baseRotation = 0;
 
@@ -44,14 +46,14 @@ export default function projectile(
 
   clone.getBoundingClientRect();
 
-  const projRect = projectile.getBoundingClientRect();
-  const fieldRect = field.getBoundingClientRect();
+  const flyingRect = flying.getBoundingClientRect();
+  const containerRect = containerElement.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
 
-  const startX = projRect.left - fieldRect.left;
-  const startY = projRect.top - fieldRect.top;
-  const endX = targetRect.left - fieldRect.left + (targetRect.width - clone.offsetWidth) / 2;
-  const endY = targetRect.top - fieldRect.top + (targetRect.height - clone.offsetHeight) / 2;
+  const startX = flyingRect.left - containerRect.left;
+  const startY = flyingRect.top - containerRect.top;
+  const endX = targetRect.left - containerRect.left + (targetRect.width - clone.offsetWidth) / 2;
+  const endY = targetRect.top - containerRect.top + (targetRect.height - clone.offsetHeight) / 2;
 
   clone.style.left = `${startX}px`;
   clone.style.top = `${startY}px`;
@@ -62,11 +64,10 @@ export default function projectile(
   const moveX = options?.moveX ?? true;
   const moveY = options?.moveY ?? true;
   const targetScale = options?.scale ?? 1;
-  const onTransitionEnd = options?.onTransitionEnd ?? (() => {});
   const removeOriginal = options?.removeOriginal ?? true;
 
   if (removeOriginal) {
-    projectile.remove();
+    flying.remove();
   }
 
   const distanceX = endX - startX;
@@ -116,7 +117,9 @@ export default function projectile(
       requestAnimationFrame(animate);
     } else {
       try {
-        onTransitionEnd();
+        if (options?.onTransitionEnd) {
+          options.onTransitionEnd();
+        }
       } catch (e) {
         console.error("Error in onTransitionEnd callback", e);
       }
@@ -126,6 +129,3 @@ export default function projectile(
 
   requestAnimationFrame(animate);
 }
-
-// Allow access from HTML onclick
-(window as any).projectile = projectile;
