@@ -9,6 +9,7 @@ export default function flyTo(
     onTransitionEnd?: () => void,
     removeOriginal?: boolean,
     resetTransformation?: boolean,
+    cloneStyles?: Partial<CSSStyleDeclaration> | Record<string, string>,
   } = {}
 ) {
   const {
@@ -19,6 +20,7 @@ export default function flyTo(
     onTransitionEnd = () => {},
     removeOriginal = true,
     resetTransformation = false,
+    cloneStyles,
   } = options;
 
   const flyingEl = document.getElementById(flyingId);
@@ -40,13 +42,16 @@ export default function flyTo(
     animation: 'none',
   });
   
-  // Reset transformOrigin if option is enabled
+  // Reset transformation if option is enabled
   if (resetTransformation) {
-    // We temporarily set transform to none to clear any existing transforms
-    // but we'll override it shortly with the animation transform
     clone.style.transform = 'none';
     clone.style.transformOrigin = 'center center';
   }
+  // Apply custom clone styles if provided
+  if (cloneStyles) {
+    Object.assign(clone.style, cloneStyles);
+  }
+  
   document.body.appendChild(clone);
   
   clone.getBoundingClientRect();

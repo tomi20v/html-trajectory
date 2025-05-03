@@ -76,8 +76,6 @@ Animates an element flying in a **straight linear path** to the target.
   - **`removeOriginal`** — Whether to remove the original element (default is `true`).
   - **`resetTransformation`** — When true, resets the clone's transform and transform-origin after cloning (default is `false`).
 
-### Example
-
 ```
 cannonBall(flyingId: string, targetId: string, options?: FlyOptions): void
 ```

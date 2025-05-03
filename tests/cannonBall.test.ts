@@ -156,7 +156,6 @@ describe('cannonBall', () => {
     expect(cloneEl.style.left).toBe('0px');
     expect(cloneEl.style.width).toBe('100%');
     expect(cloneEl.style.height).toBe('100%');
-    expect(cloneEl.style.transform).toBe('none');
   });
   
   it('should remove original element by default', () => {
@@ -458,5 +457,28 @@ describe('cannonBall', () => {
     expect(wrapperEl.remove).toHaveBeenCalled();
     
     vi.useRealTimers();
+  });
+
+  it('should apply custom styles from cloneStyles option', () => {
+    // Define custom styles to apply
+    const customStyles = {
+      border: '1px solid blue',
+      opacity: '0.8',
+      filter: 'blur(2px)'
+    };
+
+    cannonBall('flying-element', 'target-element', {
+      cloneStyles: customStyles
+    });
+
+    // Verify custom styles were applied to the clone
+    expect(cloneEl.style.border).toBe('1px solid blue');
+    expect(cloneEl.style.opacity).toBe('0.8');
+    expect(cloneEl.style.filter).toBe('blur(2px)');
+
+    // Make sure the default styles are still applied
+    expect(cloneEl.style.position).toBe('absolute');
+    expect(cloneEl.style.top).toBe('0px');
+    expect(cloneEl.style.left).toBe('0px');
   });
 });

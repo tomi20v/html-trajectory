@@ -1,9 +1,6 @@
 // tests/projectile.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import projectile from '../src/projectile';
-// tests/projectile.test.ts
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import projectile from '../src/projectile';
 
 describe('projectile', () => {
   let flyingEl: HTMLElement;
@@ -524,4 +521,22 @@ describe('projectile', () => {
     mockConsoleError.mockRestore();
   });
 
+  it('should apply custom styles from cloneStyles option', () => {
+    // Create custom styles to apply to the clone
+    const customStyles = {
+      border: '2px solid red',
+      borderRadius: '10px',
+      boxShadow: '0 0 10px rgba(0,0,0,0.5)'
+    };
+    
+    projectile('projectile-element', 'target-element', {
+      cloneStyles: customStyles
+    });
+    
+    // Verify the custom styles were applied to the clone
+    expect(cloneEl.style.border).toBe('2px solid red');
+    expect(cloneEl.style.borderRadius).toBe('10px');
+    expect(cloneEl.style.boxShadow).toBe('0 0 10px rgba(0,0,0,0.5)');
+  });
+  
 });

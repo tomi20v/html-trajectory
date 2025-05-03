@@ -11,6 +11,7 @@ export default function cannonBall(
     onTransitionEnd?: () => void;
     removeOriginal?: boolean;
     resetTransformation?: boolean;
+    cloneStyles?: Partial<CSSStyleDeclaration> | Record<string, string>;
   } = {}
   ) {
   const {
@@ -23,6 +24,7 @@ export default function cannonBall(
     onTransitionEnd = () => {},
     removeOriginal = true,
     resetTransformation = false,
+    cloneStyles
   } = options;
 
   const flyingEl = document.getElementById(flyingId);
@@ -56,12 +58,16 @@ export default function cannonBall(
     width: '100%',
     height: '100%',
   });
-  // Always set transform to none for the initial clone
-  clone.style.transform = 'none';
-  
+
   // Reset transformOrigin if option is enabled
   if (resetTransformation) {
+    clone.style.transform = 'none';
     clone.style.transformOrigin = 'center center';
+  }
+
+  // Apply custom styles to the clone if provided
+  if (cloneStyles) {
+    Object.assign(clone.style, cloneStyles);
   }
 
   wrapper.appendChild(clone);
