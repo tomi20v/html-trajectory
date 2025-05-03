@@ -10,7 +10,6 @@ export default function projectile(
     onTransitionEnd?: () => void;
     removeOriginal?: boolean;
     resetTransformation?: boolean;
-    cloneStyles?: Partial<CSSStyleDeclaration> | Record<string, string>;
   }
 ) {
   const flying = document.getElementById(flyingId) as HTMLElement | null;
@@ -34,10 +33,10 @@ export default function projectile(
     clone.style.transform = 'none';
     clone.style.transformOrigin = 'center center';
   }
-  // Apply custom clone styles if provided
-  if (options?.cloneStyles) {
-    Object.assign(clone.style, options.cloneStyles);
-  }
+  
+  // Add html-trajectory-cloned class
+  clone.classList.add("html-trajectory-cloned");
+  
   containerElement.appendChild(clone);
 
   const computedStyle = window.getComputedStyle(flying);

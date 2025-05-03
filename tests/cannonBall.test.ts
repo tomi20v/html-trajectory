@@ -459,26 +459,11 @@ describe('cannonBall', () => {
     vi.useRealTimers();
   });
 
-  it('should apply custom styles from cloneStyles option', () => {
-    // Define custom styles to apply
-    const customStyles = {
-      border: '1px solid blue',
-      opacity: '0.8',
-      filter: 'blur(2px)'
-    };
-
-    cannonBall('flying-element', 'target-element', {
-      cloneStyles: customStyles
-    });
-
-    // Verify custom styles were applied to the clone
-    expect(cloneEl.style.border).toBe('1px solid blue');
-    expect(cloneEl.style.opacity).toBe('0.8');
-    expect(cloneEl.style.filter).toBe('blur(2px)');
-
-    // Make sure the default styles are still applied
-    expect(cloneEl.style.position).toBe('absolute');
-    expect(cloneEl.style.top).toBe('0px');
-    expect(cloneEl.style.left).toBe('0px');
+  it('should add html-trajectory-cloned class to cloned element', () => {
+    cannonBall('flying-element', 'target-element');
+    
+    // Verify the html-trajectory-cloned class was added to the clone
+    expect(cloneEl.classList.contains('html-trajectory-cloned')).toBe(true);
   });
+  
 });

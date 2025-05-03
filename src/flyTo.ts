@@ -9,7 +9,6 @@ export default function flyTo(
     onTransitionEnd?: () => void,
     removeOriginal?: boolean,
     resetTransformation?: boolean,
-    cloneStyles?: Partial<CSSStyleDeclaration> | Record<string, string>,
   } = {}
 ) {
   const {
@@ -20,7 +19,6 @@ export default function flyTo(
     onTransitionEnd = () => {},
     removeOriginal = true,
     resetTransformation = false,
-    cloneStyles,
   } = options;
 
   const flyingEl = document.getElementById(flyingId);
@@ -47,10 +45,9 @@ export default function flyTo(
     clone.style.transform = 'none';
     clone.style.transformOrigin = 'center center';
   }
-  // Apply custom clone styles if provided
-  if (cloneStyles) {
-    Object.assign(clone.style, cloneStyles);
-  }
+  
+  // Add html-trajectory-cloned class
+  clone.classList.add("html-trajectory-cloned");
   
   document.body.appendChild(clone);
   

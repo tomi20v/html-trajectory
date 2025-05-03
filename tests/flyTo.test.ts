@@ -215,23 +215,13 @@ describe('flyTo', () => {
     expect(cloneEl.style.transformOrigin).not.toBe('center center');
   });
   
-  it('should apply custom styles when cloneStyles option is provided', () => {
-    const customStyles = {
-      border: '2px solid red',
-      borderRadius: '50%',
-      opacity: '0.8',
-      backgroundColor: 'blue'
-    };
+  it('should add html-trajectory-cloned class to cloned element', () => {
+    flyTo('flying-element', 'target-element');
     
-    flyTo('flying-element', 'target-element', { cloneStyles: customStyles });
+    // Verify the html-trajectory-cloned class was added to the clone
+    expect(cloneEl.classList.contains('html-trajectory-cloned')).toBe(true);
     
-    // Verify the custom styles were applied to the clone
-    expect(cloneEl.style.border).toBe('2px solid red');
-    expect(cloneEl.style.borderRadius).toBe('50%');
-    expect(cloneEl.style.opacity).toBe('0.8');
-    expect(cloneEl.style.backgroundColor).toBe('blue');
-    
-    // Verify the original transformation styles are still applied
+    // Verify the transformation styles are still applied
     expect(cloneEl.style.transform).toBe('translate(200px, 200px) scale(0.1)');
   });
   

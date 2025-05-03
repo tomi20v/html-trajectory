@@ -11,7 +11,6 @@ export default function cannonBall(
     onTransitionEnd?: () => void;
     removeOriginal?: boolean;
     resetTransformation?: boolean;
-    cloneStyles?: Partial<CSSStyleDeclaration> | Record<string, string>;
   } = {}
   ) {
   const {
@@ -24,7 +23,6 @@ export default function cannonBall(
     onTransitionEnd = () => {},
     removeOriginal = true,
     resetTransformation = false,
-    cloneStyles
   } = options;
 
   const flyingEl = document.getElementById(flyingId);
@@ -65,10 +63,8 @@ export default function cannonBall(
     clone.style.transformOrigin = 'center center';
   }
 
-  // Apply custom styles to the clone if provided
-  if (cloneStyles) {
-    Object.assign(clone.style, cloneStyles);
-  }
+  // Add html-trajectory-cloned class
+  clone.classList.add("html-trajectory-cloned");
 
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
